@@ -29,8 +29,8 @@ services:
       # Coolify service discovery
       SERVICE_FQDN_WEB: /
 
-      # Bugsink configuration - KEY FIX: Set BASE_URL to main domain
-      BASE_URL: http://bugsink-xss8occg0k4kogog0kkkw8g8.91.99.12.107.sslip.io
+      # Bugsink configuration - KEY FIX: Use Coolify's auto-generated SERVICE_URL_WEB
+      BASE_URL: ${SERVICE_URL_WEB:-http://localhost:8000}
       SECRET_KEY: ${SERVICE_PASSWORD_64_BUGSINK}
       CREATE_SUPERUSER: admin:${SERVICE_PASSWORD_BUGSINK}
       PORT: 8000
