@@ -1,0 +1,17 @@
+# Local documentation and notes
+memory-bank/
+README.md
+
+# Git files
+.git/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

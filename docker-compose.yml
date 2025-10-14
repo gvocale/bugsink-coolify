@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SERVICE_PASSWORD_ROOT}
+      MYSQL_DATABASE: bugsink
+      MYSQL_USER: ${SERVICE_USER_BUGSINK}
+      MYSQL_PASSWORD: ${SERVICE_PASSWORD_BUGSINK}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "exit | mysql -h localhost -P 3306 -u root -p$$MYSQL_ROOT_PASSWORD",
+        ]
+      interval: 1s
+      timeout: 20s
+      retries: 30
+
+  web:
+    image: bugsink/bugsink
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      # Coolify service discovery
+      SERVICE_FQDN_WEB: /
+
+      # Bugsink configuration - KEY FIX: Set BASE_URL to main domain
+      BASE_URL: http://bugsink-xss8occg0k4kogog0kkkw8g8.91.99.12.107.sslip.io
+      SECRET_KEY: ${SERVICE_PASSWORD_64_BUGSINK}
+      CREATE_SUPERUSER: admin:${SERVICE_PASSWORD_BUGSINK}
+      PORT: 8000
+
+      # Database connection
+      DATABASE_URL: mysql://${SERVICE_USER_BUGSINK}:${SERVICE_PASSWORD_BUGSINK}@mysql:3306/bugsink
+
+      # Proxy configuration for Coolify
+      BEHIND_HTTPS_PROXY: "False"
+      BEHIND_PLAIN_HTTP_PROXY: "True"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'python -c ''import requests; requests.get("http://localhost:8000/").raise_for_status()''',
+        ]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+
+volumes:
+  mysql-data:
