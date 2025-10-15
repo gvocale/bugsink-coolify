@@ -26,10 +26,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     environment:
-      # Coolify service discovery
-      SERVICE_FQDN_WEB: /
-
-      # Bugsink configuration - KEY FIX: Use Coolify's auto-generated SERVICE_URL_WEB
+      # Bugsink configuration - Use Coolify's auto-generated SERVICE_URL_WEB
       BASE_URL: ${SERVICE_URL_WEB:-http://localhost:8000}
       SECRET_KEY: ${SERVICE_PASSWORD_64_BUGSINK}
       CREATE_SUPERUSER: admin:${SERVICE_PASSWORD_BUGSINK}
