@@ -73,6 +73,33 @@ BASE_URL: http://your-actual-domain.com
 
 ## Troubleshooting
 
+### 404 Page Not Found
+
+If you see "404 page not found" when accessing your domain:
+
+**Cause:** The web service port isn't exposed, preventing Coolify's reverse proxy (Traefik/Caddy) from routing traffic.
+
+**Solution:** Ensure the `expose` directive is present in `docker-compose.yml`:
+
+```yaml
+web:
+  image: bugsink/bugsink
+  expose:
+    - "8000"
+  environment:
+    # ... rest of config
+```
+
+Without the `expose` directive, the container doesn't expose port 8000, and Traefik can't auto-configure the service port routing.
+
+### SERVICE_FQDN_WEB Override Issue
+
+If routing doesn't work after deployment:
+
+**Cause:** Setting `SERVICE_FQDN_WEB: /` in environment variables overrides Coolify's automatic domain routing.
+
+**Solution:** Remove any `SERVICE_FQDN_WEB` configuration from `docker-compose.yml`. Coolify automatically injects this variable based on your domain configuration in the UI.
+
 ### ALLOWED_HOSTS Error
 
 If you see:
