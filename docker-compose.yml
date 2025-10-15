@@ -25,6 +25,8 @@ services:
       mysql:
         condition: service_healthy
     restart: unless-stopped
+    expose:
+      - "8000"
     environment:
       # Bugsink configuration - Use Coolify's auto-generated SERVICE_URL_WEB
       BASE_URL: ${SERVICE_URL_WEB:-http://localhost:8000}
