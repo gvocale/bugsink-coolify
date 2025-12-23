@@ -33,7 +33,7 @@ The Resend API key is stored as an environment variable in Coolify, not in the g
 
 Skip to Step 2 and use: `re_bWLQUypM_ExTEaUbRWUdc5qNzFaR3xvDF`
 
-## Step 2: Set Environment Variable in Coolify
+## Step 2: Set Environment Variables in Coolify
 
 1. **Log in to Coolify Dashboard**
 
@@ -47,16 +47,24 @@ Skip to Step 2 and use: `re_bWLQUypM_ExTEaUbRWUdc5qNzFaR3xvDF`
 
    - Click on the **Environment Variables** tab
 
-4. **Add the new variable**
+4. **Add the API key variable**
 
    - Click **+ Add**
    - Variable Name: `RESEND_API_KEY`
    - Value: `re_your_new_api_key_here` (paste your actual key)
    - Click **Save**
 
-5. **Verify the variable**
-   - Ensure `RESEND_API_KEY` appears in the list
-   - The value should be masked/hidden for security
+5. **Add the from email variable (Optional but Recommended)**
+
+   - Click **+ Add**
+   - Variable Name: `DEFAULT_FROM_EMAIL`
+   - Value: `Bugsink <no-reply@tubedatabase.co>` (or your custom domain)
+   - Click **Save**
+   - See "Custom Domain Setup" section below for how to set up your own domain
+
+6. **Verify the variables**
+   - Ensure both `RESEND_API_KEY` and `DEFAULT_FROM_EMAIL` appear in the list
+   - Values should be masked/hidden for security
 
 ## Step 3: Deploy the Changes
 
@@ -170,27 +178,224 @@ DEFAULT_FROM_EMAIL: "Bugsink <onboarding@resend.dev>"
 - Use production keys for testing
 - Leave old keys active after rotation
 
+## Custom Domain Setup
+
+Using a custom domain (e.g., `no-reply@tubedatabase.co`) significantly improves email deliverability and builds trust with recipients.
+
+### Why Use a Custom Domain?
+
+- ✅ Better deliverability (emails less likely to go to spam)
+- ✅ Professional appearance
+- ✅ Brand recognition
+- ✅ Control over sender reputation
+- ⚠️ Default `onboarding@resend.dev` is only for testing
+
+### Step 1: Add Domain to Resend
+
+1. **Log into Resend**
+
+   - Go to https://resend.com
+   - Navigate to **Domains** in the left menu
+
+2. **Add Your Domain**
+
+   - Click **Add Domain**
+   - Enter your domain: `tubedatabase.co`
+   - Click **Add Domain**
+
+3. **Copy DNS Records**
+   - Resend will generate 3 DNS records:
+     - 1 MX record (for bounce handling)
+     - 2 TXT records (SPF and DKIM for authentication)
+
+### Step 2: Configure DNS Records
+
+Add these records to your DNS provider (e.g., Cloudflare, Namecheap, GoDaddy):
+
+**1. MX Record**
+
+```
+Type: MX
+Name: @ (or tubedatabase.co)
+Value: feedback-smtp.us-east-1.amazonses.com
+Priority: 10
+```
+
+**2. SPF Record (TXT)**
+
+```
+Type: TXT
+Name: @ (or tubedatabase.co)
+Value: v=spf1 include:amazonses.com ~all
+```
+
+**3. DKIM Record (TXT)**
+
+```
+Type: TXT
+Name: [Resend provides - usually: resend._domainkey]
+Value: [Long string provided by Resend]
+```
+
+#### If Using Cloudflare:
+
+1. Go to Cloudflare dashboard
+2. Select your domain: **tubedatabase.co**
+3. Click **DNS** → **Records**
+4. For each record:
+   - Click **Add Record**
+   - Select the **Type** (MX or TXT)
+   - Enter the **Name** exactly as shown
+   - Enter the **Content/Value**
+   - For MX: Set **Priority** to 10
+   - Click **Save**
+
+### Step 3: Verify Domain in Resend
+
+1. **Wait for DNS Propagation**
+
+   - Usually takes 15-30 minutes
+   - Can take up to 72 hours in rare cases
+
+2. **Check DNS Propagation** (Optional)
+
+   - Use online tools like: https://dnschecker.org
+   - Search for your domain with record type
+
+3. **Verify in Resend**
+
+   - Go back to Resend → Domains
+   - Click **Verify DNS Records** button
+   - Each record should show **Verified** with a green checkmark
+
+4. **Troubleshooting Verification**
+   - If not verified after 30 minutes, double-check DNS records
+   - Ensure no typos in record values
+   - Some DNS providers require `@` for root domain
+   - Others require the full domain name `tubedatabase.co`
+
+### Step 4: Add DMARC Record (Recommended)
+
+DMARC builds additional trust with email providers:
+
+**Option 1: Simple DMARC**
+
+```
+Type: TXT
+Name: _dmarc
+Value: v=DMARC1; p=quarantine; rua=mailto:dmarc@tubedatabase.co
+```
+
+**Option 2: Use DMARC Generator (Recommended)**
+
+1. Go to https://dmarcdkim.com/dmarc-check
+2. Enter `tubedatabase.co`
+3. Copy the suggested DMARC value
+4. Add it to your DNS provider
+5. Sign up at DmarcDkim.com for report monitoring
+
+### Step 5: Update Environment Variable
+
+1. **In Coolify Dashboard**
+
+   - Go to your Bugsink service
+   - Navigate to **Environment Variables**
+   - Find or add: `DEFAULT_FROM_EMAIL`
+   - Update value to: `Bugsink <no-reply@tubedatabase.co>`
+   - Click **Save**
+
+2. **Redeploy Service**
+   - Click **Redeploy** button
+   - Wait for deployment to complete
+
+### Step 6: Test Custom Domain
+
+1. **Send Test Email from Bugsink**
+
+   - Trigger a password reset or user registration
+   - Check that email comes from `no-reply@tubedatabase.co`
+
+2. **Check Resend Dashboard**
+
+   - Go to https://resend.com/emails
+   - Verify emails show your custom domain
+   - Check delivery status
+
+3. **Check Email Headers**
+   - Open received email
+   - View email source/headers
+   - Verify SPF, DKIM pass
+
+### Using Subdomains (Alternative)
+
+For better reputation isolation, consider using a subdomain:
+
+**Example:** `send.tubedatabase.co` or `mail.tubedatabase.co`
+
+**Benefits:**
+
+- Isolates sending reputation from main domain
+- Allows different policies for different types of emails
+- Industry best practice
+
+**Setup:**
+
+1. In Resend, add: `send.tubedatabase.co`
+2. Follow same DNS configuration steps
+3. Use: `Bugsink <no-reply@send.tubedatabase.co>`
+
+### Coolify Notifications with Custom Domain
+
+To use your custom domain for Coolify notifications:
+
+1. **Configure Coolify Email**
+
+   - Go to Coolify → Settings → Notifications → Email
+   - Choose **SMTP Server**
+   - Enter:
+     ```
+     From Name: Coolify
+     From Address: coolify@tubedatabase.co
+     Host: smtp.resend.com
+     Port: 587
+     Username: resend
+     Password: [Your Resend API Key]
+     Encryption: SSL (not TLS - see known issues)
+     ```
+
+2. **Enable and Test**
+   - Enable via the **Enabled** checkbox
+   - Click **Send Test Email**
+   - Check delivery
+
+### Important Notes
+
+- **DNS Propagation**: Be patient - usually 15-30 minutes
+- **Copy-Paste Carefully**: DKIM records are long and must be exact
+- **Test Thoroughly**: Send test emails before production use
+- **Monitor Deliverability**: Check Resend dashboard regularly
+- **Known Issue**: Coolify SMTP with port 587 + TLS doesn't work in some versions; use 587 + SSL instead
+
 ## Future Improvements
 
-### 1. Custom Domain
-
-For better deliverability:
-
-1. Add your domain in Resend
-2. Configure DNS records (SPF, DKIM, DMARC)
-3. Update `DEFAULT_FROM_EMAIL` to use your domain
-4. Redeploy
-
-### 2. Email Templates
+### 1. Email Templates
 
 Bugsink supports customizing email templates. See Bugsink documentation for details.
 
-### 3. Rate Limiting
+### 2. Rate Limiting
 
 Resend free tier: 3,000 emails/month
 
 - Monitor usage in Resend dashboard
 - Upgrade plan if needed
+
+### 3. Multiple Domains
+
+You can configure multiple domains in Resend:
+
+- Different domains for different applications
+- Separate marketing vs transactional emails
+- Improved reputation management
 
 ## Support
 

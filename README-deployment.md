@@ -35,6 +35,10 @@ SERVICE_PASSWORD_ROOT=<your-secure-root-password>
 SERVICE_USER_BUGSINK=<your-database-user>
 SERVICE_PASSWORD_BUGSINK=<your-secure-password>
 SERVICE_PASSWORD_64_BUGSINK=<your-django-secret-key>
+
+# Brevo Email Configuration
+BREVO_SMTP_USER=9e9969001@smtp-brevo.com
+BREVO_SMTP_KEY=<your-brevo-smtp-key>
 ```
 
 **Generate secure values:**
@@ -51,13 +55,13 @@ openssl rand -base64 50
 
 Set your domain in Coolify, e.g.:
 
-- `bugsink.yourdomain.com`
+- `bugsink.giovanni.is`
 - Or use Coolify's auto-generated domain
 
 **Important:** Update `BASE_URL` in `docker-compose.yml` to match your domain:
 
 ```yaml
-BASE_URL: http://your-actual-domain.com
+BASE_URL: https://bugsink.giovanni.is
 ```
 
 ### 5. Deploy
@@ -108,7 +112,7 @@ If you see:
 Host 'xxx' not in ALLOWED_HOSTS
 ```
 
-**Solution:** Ensure `BASE_URL` in `docker-compose.yml` matches your actual domain (without port numbers).
+**Solution:** Ensure `BASE_URL` in `docker-compose.yml` matches your actual domain (without port numbers), e.g., `https://bugsink.giovanni.is`.
 
 ### Database Connection Issues
 

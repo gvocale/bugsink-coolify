@@ -38,16 +38,17 @@ services:
       DATABASE_URL: mysql://${SERVICE_USER_BUGSINK}:${SERVICE_PASSWORD_BUGSINK}@mysql:3306/bugsink
 
       # Proxy configuration for Coolify
-      BEHIND_HTTPS_PROXY: "False"
-      BEHIND_PLAIN_HTTP_PROXY: "True"
+      BEHIND_HTTPS_PROXY: "True"
+      BEHIND_PLAIN_HTTP_PROXY: "False"
 
-      # Email Configuration (Resend SMTP)
-      EMAIL_HOST: "smtp.resend.com"
+      # Email Configuration (Brevo SMTP)
+      EMAIL_HOST: "smtp-relay.brevo.com"
       EMAIL_PORT: "465"
+      EMAIL_USE_TLS: "False"
       EMAIL_USE_SSL: "True"
-      EMAIL_HOST_USER: "resend"
-      EMAIL_HOST_PASSWORD: ${RESEND_API_KEY}
-      DEFAULT_FROM_EMAIL: "Bugsink <onboarding@resend.dev>"
+      EMAIL_HOST_USER: ${BREVO_SMTP_USER}
+      EMAIL_HOST_PASSWORD: ${BREVO_SMTP_KEY}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-Bugsink <gvocale@gmail.com>}
     healthcheck:
       test:
         [
