@@ -41,11 +41,11 @@ services:
       BEHIND_HTTPS_PROXY: "True"
       BEHIND_PLAIN_HTTP_PROXY: "False"
 
-      # Email Configuration (Brevo SMTP)
+      # Email Configuration (Brevo SMTP via Port 2525 to bypass Hetzner block)
       EMAIL_HOST: "smtp-relay.brevo.com"
-      EMAIL_PORT: "465"
-      EMAIL_USE_TLS: "False"
-      EMAIL_USE_SSL: "True"
+      EMAIL_PORT: "2525"
+      EMAIL_USE_TLS: "True"
+      EMAIL_USE_SSL: "False"
       EMAIL_HOST_USER: ${BREVO_SMTP_USER}
       EMAIL_HOST_PASSWORD: ${BREVO_SMTP_KEY}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-Bugsink <gvocale@gmail.com>}
