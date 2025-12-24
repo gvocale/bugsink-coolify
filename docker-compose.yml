@@ -40,9 +40,6 @@ services:
       # Proxy configuration for Coolify
       BEHIND_HTTPS_PROXY: "True"
       BEHIND_PLAIN_HTTP_PROXY: "False"
-    labels:
-      - "traefik.http.services.bugsink-web-service.loadbalancer.server.port=8000"
-      - "traefik.http.routers.bugsink-web-secure.service=bugsink-web-service"
 
       # Email Configuration (Brevo SMTP via Port 2525 to bypass Hetzner block)
       EMAIL_HOST: "smtp-relay.brevo.com"
@@ -52,6 +49,10 @@ services:
       EMAIL_HOST_USER: ${BREVO_SMTP_USER}
       EMAIL_HOST_PASSWORD: ${BREVO_SMTP_KEY}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-Bugsink <gvocale@gmail.com>}
+
+    labels:
+      - "traefik.http.services.bugsink-web-service.loadbalancer.server.port=8000"
+      - "traefik.http.routers.bugsink-web-secure.service=bugsink-web-service"
     healthcheck:
       test:
         [
