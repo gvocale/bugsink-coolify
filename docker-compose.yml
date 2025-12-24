@@ -51,8 +51,7 @@ services:
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-Bugsink <gvocale@gmail.com>}
 
     labels:
-      - "traefik.http.services.bugsink-web-service.loadbalancer.server.port=8000"
-      - "traefik.http.routers.bugsink-web-secure.service=bugsink-web-service"
+      - "traefik.http.services.web.loadbalancer.server.port=8000"
     healthcheck:
       test:
         [
