@@ -30,7 +30,7 @@ services:
     environment:
       # Bugsink configuration - Use Coolify's auto-generated SERVICE_URL_WEB
       BASE_URL: "https://bugsink.giovanni.is"
-      ALLOWED_HOSTS: "bugsink.giovanni.is"
+      ALLOWED_HOSTS: "bugsink.giovanni.is,localhost"
       SECRET_KEY: ${SERVICE_PASSWORD_64_BUGSINK}
       CREATE_SUPERUSER: admin:${SERVICE_PASSWORD_BUGSINK}
       PORT: 8000
