@@ -51,7 +51,13 @@ services:
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-Bugsink <gvocale@gmail.com>}
 
     labels:
-      - "traefik.http.services.web.loadbalancer.server.port=8000"
+      - "traefik.enable=true"
+      - "traefik.http.routers.bugsink-custom.rule=Host(`bugsink.giovanni.is`)"
+      - "traefik.http.routers.bugsink-custom.entryPoints=https"
+      - "traefik.http.routers.bugsink-custom.tls=true"
+      - "traefik.http.routers.bugsink-custom.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bugsink-custom.service=bugsink-custom-svc"
+      - "traefik.http.services.bugsink-custom-svc.loadbalancer.server.port=8000"
     healthcheck:
       test:
         [
